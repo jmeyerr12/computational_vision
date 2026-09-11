@@ -14,7 +14,7 @@ N_GROUPS=4
 def load_image(path):
     img = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE) # read img and make it grayscale
     if img is None:
-        print("Not possible to open {path}")
+        print(f"Not possible to open {path}")
         return
     if img.shape != (SIZE, SIZE):
         img = cv2.resize(img, (SIZE, SIZE))
@@ -32,7 +32,7 @@ def apply_filters(img):
     
         # 7 gabor filters (texture in different directions)        
         for angle in ANGLES:
-            theta = np.deg2rad()
+            theta = np.deg2rad(angle)
             
             kernel = cv2.getGaborKernel(
                 (k,k), # filter size
@@ -66,7 +66,7 @@ def extract_vectors(img):
             vectors.append(vector)
     return np.array(vectors, dtype=np.float32)
                 
-def criar_segmentacao(labels):
+def create_segmentation(labels):
     # Paint each window according to k-means group
     colors = [
         (255, 0, 0),      # blue
@@ -108,7 +108,7 @@ def main():
     # feature extraction
     for path in archives:
         image = load_image(path)
-        features = extract_vectors
+        features = extract_vectors(image)
         
         images.append((path, image, features))
         all_features.append(features)
