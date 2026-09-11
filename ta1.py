@@ -3,7 +3,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-OUT_DIR="output"
+IMG_DIR=Path("images")
+OUT_DIR=Path("output")
 SIZE = 512
 WINDOW=32
 SCALES=[2,4,8]
@@ -65,13 +66,34 @@ def extract_vectors(img):
             vectors.append(vector)
     return np.array(vectors, dtype=np.float32)
                 
+def criar_segmentacao(labels):
+    # Paint each window according to k-means group
+    colors = [
+        (255, 0, 0),      # blue
+        (0, 255, 0),      # green
+        (0, 0, 255),      # red
+        (0, 255, 255),    # yellow
+        (255, 0, 255),    # purple (magenta actually)
+        (255, 255, 0),    # cyan
+    ]
+
+    segmentada = np.zeros((SIZE, SIZE, 3), dtype=np.uint8)
+
+    i = 0
+    for y in range(0, SIZE, WINDOW):
+        for x in range(0, SIZE, WINDOW):
+            grupo = int(labels[i])
+            segmentada[y:y + WINDOW, x:x + WINDOW] = colors[grupo % len(colors)]
+            i += 1
+
+    return segmentada
 
 def main():
     OUT_DIR.mkdir(exist_ok=True)
     
     extensions = {".jpg", ".jpeg", ".png", ".bmp"}
     archives = sorted(
-        p for p in OUT_DIR.iterdir()
+        p for p in IMG_DIR.iterdir()
         if p.suffix.lower() in extensions
     )
     if not archives:
@@ -123,8 +145,27 @@ def main():
     labels = labels.flatten()
     
     # segmented img creation
-
+    start = 0 
     
+    for path, img, features in images:
+        quantity = len(features)
+        labels_img = labels[start: start + quantity]
+        start += quantity
+        
+        segmented = create_segmentation(labels_img)
+        
+        colored_img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        overlay = cv2.addWeighted(colored_img, 0.6, segmented, 0.4, 0)
+        
+        name = path.stem
+        cv2.imwrite(str(OUT_DIR / f"{name}_segmented.png"), segmented)
+        cv2.imwrite(str(OUT_DIR / f"{name}_overlay.png"), overlay)
+    
+    print()
+    print("Done!")
+    print("Amount of filters:", len(SCALES) * (len(ANGLES) + 1))
+    print("Amount of dimensions: 24")
+    print("Results saved in " + str(OUT_DIR))
         
 
 if __name__ == "__main__":
