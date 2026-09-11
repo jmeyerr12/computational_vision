@@ -8,6 +8,7 @@ SIZE = 512
 WINDOW=32
 SCALES=[2,4,8]
 ANGLES=[0,22.5,45,67.5,90,112.5,135]
+N_GROUPS=4
 
 def load_image(path):
     img = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE) # read img and make it grayscale
@@ -100,7 +101,30 @@ def main():
     x = (x - mean) / std
     x = x.astype(np.float32)
     
-    # grouping 
+    # grouping (uses euclidian distance)
+    
+    criteria = (
+        cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER,
+        100,
+        0.1,
+    )
+    
+    cv2.setRNGSeed(42)
+
+    _, labels, _ = cv2.kmeans(
+        x,
+        N_GROUPS,
+        None,
+        criteria,
+        10,
+        cv2.KMEANS_PP_CENTERS,
+    )
+
+    labels = labels.flatten()
+    
+    # segmented img creation
+
+    
         
 
 if __name__ == "__main__":
