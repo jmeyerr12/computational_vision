@@ -3,9 +3,9 @@
 ## Uso
 
 1. Crie um ambiente virtual e instale `pip install -r requirements.txt`.
-2. Coloque 15 a 20 fotos de um tabuleiro na pasta `images/`, com ângulos variados, mesma câmera e mesma resolução.
+2. Coloque 10 fotos de um tabuleiro na pasta `images/`, com ângulos variados, mesma câmera e mesma resolução.
 3. No `main.py`, ajuste `PATTERN` (número de **cantos internos**, em colunas e linhas) e `SQUARE_MM` (lado do quadrado em milímetros).
-4. Execute `python main.py`.
+4. Execute `python3 main.py`.
 5. Consulte os resultados na pasta `output/`.
 
 São gerados: matriz intrínseca e distorção (`calibration.npz`), imagens com cantos, imagens sem distorção, comparações, projeções 3D para 2D e tabela CSV com erros em pixels.
